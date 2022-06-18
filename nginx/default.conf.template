@@ -1,0 +1,26 @@
+upstream broccoli-fe {
+    server ${BROCCOLI_HOST}:${BROCCOLI_PORT};
+}
+
+upstream didcore-fe {
+    server ${DID_HOST}:${DID_PORT};
+}
+
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name  ${FE_HOST};
+
+    location ~ ^/api/v0/(user|cover-letter|position)(.*)$ {
+        proxy_pass         http://broccoli-fe/api/v0/$1$2;
+    }
+
+    location ~ ^/api/v0/(claim|resume)(.*)$ {
+        proxy_pass         http://didcore-fe/api/v0/$1$2;
+    }
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+}
